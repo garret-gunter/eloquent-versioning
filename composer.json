@@ -1,5 +1,5 @@
 {
-    "name": "proai/eloquent-versioning",
+    "name": "garret-gunter/eloquent-versioning",
     "description": "An extension for the Eloquent ORM to support versioning.",
     "keywords": [
         "laravel",
@@ -12,17 +12,21 @@
         "audit",
         "audits"
     ],
-    "homepage": "http://github.com/ProAI/eloquent-versioning",
+    "homepage": "http://github.com/garret-gunter/eloquent-versioning",
     "license": "MIT",
     "authors": [
         {
             "name": "Markus J. Wetzel",
             "email": "markuswetzel@gmx.net"
+        },
+        {
+            "name": "Garret Gunter",
+            "email": "garretgun@gmail.com"
         }
     ],
     "require": {
         "php": ">=7.1",
-        "illuminate/database": "5.*"
+        "illuminate/database": "6.*"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.0",
