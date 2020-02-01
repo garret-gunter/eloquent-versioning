@@ -1,12 +1,16 @@
 <?php
 
-namespace ProAI\Versioning\Tests;
+namespace ProAI\Versioning\Tests\Unit;
 
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use ProAI\Versioning\Tests\Models\Post;
 use ProAI\Versioning\Tests\Models\User;
+use ProAI\Versioning\Tests\TestCase;
 
+/**
+ * Class SoftDeletesTest
+ *
+ * @package ProAI\Versioning\Tests
+ */
 class SoftDeletesTest extends TestCase
 {
     /**
@@ -16,21 +20,21 @@ class SoftDeletesTest extends TestCase
      * @param string $model
      * @throws \Exception
      */
-    public function itWillSaveDeletedAt(string $model)
+    public function itWillSaveDeletedAt(string $model): void
     {
         $model = factory($model)->create([]);
         $model->delete();
 
-        $this->assertArraySubset([
-            'id'            => $model->id,
-            'deleted_at'    => $model->deleted_at
-        ], $model::withTrashed()->first()->toArray());
+        $version = $model::withTrashed()->first();
+
+        $this->assertEquals($model->id,$version->id);
+        $this->assertEquals($model->deleted_at, $version->deleted_at);
     }
 
     /**
      * @test
      */
-    public function itWillGetTheCorrectDeletedAtColumnOnTheMainTable()
+    public function itWillGetTheCorrectDeletedAtColumnOnTheMainTable(): void
     {
         /** @var Post $model */
         $model = factory(Post::class)->create([]);
@@ -41,7 +45,7 @@ class SoftDeletesTest extends TestCase
     /**
      * @test
      */
-    public function itWillGetTheCorrectDeletedAtColumnOnTheVersionTable()
+    public function itWillGetTheCorrectDeletedAtColumnOnTheVersionTable(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([]);
@@ -53,7 +57,7 @@ class SoftDeletesTest extends TestCase
      * @test
      * @throws \Exception
      */
-    public function itWillSaveDeletedAtInTheMainTable()
+    public function itWillSaveDeletedAtInTheMainTable(): void
     {
         /** @var Post $model */
         $model = factory(Post::class)->create([]);
@@ -69,7 +73,7 @@ class SoftDeletesTest extends TestCase
      * @test
      * @throws \Exception
      */
-    public function itWillSaveDeletedAtInTheVersionTable()
+    public function itWillSaveDeletedAtInTheVersionTable(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([]);
@@ -88,7 +92,10 @@ class SoftDeletesTest extends TestCase
         ]);
     }
 
-    public function modelProvider()
+	/**
+	 * @return array
+	 */
+	public function modelProvider(): array
     {
         return [
             [

@@ -12,24 +12,48 @@ build:
     php71:
       environment:
         php:
-          version: 7.1.12
+          version: 7.1
       tests:
         override:
           - php-scrutinizer-run
           -
-            command: vendor/bin/phpunit --coverage-clover=coverage71
+            command: vendor/bin/phpunit --coverage-clover=coverage71 --prepend .coverage-filter.php
             coverage:
               file: coverage71
               format: php-clover
     php72:
       environment:
         php:
-          version: 7.2.0
+          version: 7.2
       tests:
         override:
           - php-scrutinizer-run
           -
-            command: vendor/bin/phpunit --coverage-clover=coverage72
+            command: vendor/bin/phpunit --coverage-clover=coverage72 --prepend .coverage-filter.php
             coverage:
               file: coverage72
+              format: php-clover
+    php73:
+      environment:
+        php:
+          version: 7.3
+      tests:
+        override:
+          - php-scrutinizer-run
+          -
+            command: vendor/bin/phpunit --coverage-clover=coverage73 --prepend .coverage-filter.php
+            coverage:
+              file: coverage73
+              format: php-clover
+    php74:
+      environment:
+        php:
+          version: 7.4
+      tests:
+        override:
+          - php-scrutinizer-run
+          -
+            command: vendor/bin/phpunit --coverage-clover=coverage74 --prepend .coverage-filter.php
+            coverage:
+              file: coverage74
               format: php-clover

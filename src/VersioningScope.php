@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Database\Query\JoinClause;
 use Carbon\Carbon;
 
+/**
+ * Class VersioningScope
+ * @package ProAI\Versioning
+ */
 class VersioningScope implements Scope
 {
     /**
@@ -21,13 +25,13 @@ class VersioningScope implements Scope
      * Apply the scope to a given Eloquent query builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model|\ProAI\Versioning\Versionable  $model
      * @return void
      */
     public function apply(Builder $builder, Model $model)
     {
         if (!$this->hasVersionJoin($builder, $model->getVersionTable())) {
-            $builder->join($model->getVersionTable(), function($join) use ($model) {
+            $builder->join($model->getVersionTable(), static function(JoinClause $join) use ($model) {
                 $join->on($model->getQualifiedKeyName(), '=', $model->getQualifiedVersionKeyName());
                 $join->on($model->getQualifiedVersionColumn(), '=', $model->getQualifiedLatestVersionColumn());
             });
@@ -40,10 +44,10 @@ class VersioningScope implements Scope
      * Remove the scope from the given Eloquent query builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model|\ProAI\Versioning\Versionable  $model
      * @return void
      */
-    public function remove(Builder $builder, Model $model)
+    public function remove(Builder $builder, Model $model): void
     {
         $table = $model->getVersionTable();
 
@@ -61,7 +65,7 @@ class VersioningScope implements Scope
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
-    public function extend(Builder $builder)
+    public function extend(Builder $builder): void
     {
         foreach ($this->extensions as $extension)
         {
@@ -75,14 +79,15 @@ class VersioningScope implements Scope
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
-    protected function addVersion(Builder $builder)
+    protected function addVersion(Builder $builder): void
     {
         $builder->macro('version', function(Builder $builder, $version) {
+        	/** @var Model|\ProAI\Versioning\Versionable $model */
             $model = $builder->getModel();
 
             $this->remove($builder, $builder->getModel());
 
-            $builder->join($model->getVersionTable(), function($join) use ($model, $version) {
+            $builder->join($model->getVersionTable(), static function(JoinClause $join) use ($model, $version) {
                 $join->on($model->getQualifiedKeyName(), '=', $model->getQualifiedVersionKeyName());
                 $join->where($model->getQualifiedVersionColumn(), '=', $version);
             });
@@ -97,14 +102,15 @@ class VersioningScope implements Scope
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
-    protected function addAllVersions(Builder $builder)
+    protected function addAllVersions(Builder $builder): void
     {
         $builder->macro('allVersions', function(Builder $builder) {
+	        /** @var Model|\ProAI\Versioning\Versionable $model */
             $model = $builder->getModel();
 
             $this->remove($builder, $builder->getModel());
 
-            $builder->join($model->getVersionTable(), function($join) use ($model) {
+            $builder->join($model->getVersionTable(), static function(JoinClause $join) use ($model) {
                 $join->on($model->getQualifiedKeyName(), '=', $model->getQualifiedVersionKeyName());
             });
 
@@ -118,17 +124,22 @@ class VersioningScope implements Scope
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
-    protected function addMoment(Builder $builder)
+    protected function addMoment(Builder $builder): void
     {
         $builder->macro('moment', function(Builder $builder, Carbon $moment) {
+	        /** @var Model|\ProAI\Versioning\Versionable $model */
             $model = $builder->getModel();
 
             $this->remove($builder, $builder->getModel());
 
-            $builder->join($model->getVersionTable(), function($join) use ($model, $moment) {
+            $builder->join($model->getVersionTable(), static function(JoinClause $join) use ($model, $moment) {
                 $join->on($model->getQualifiedKeyName(), '=', $model->getQualifiedVersionKeyName());
-                $join->where('updated_at', '<=', $moment)->orderBy('updated_at', 'desc')->limit(1);
-            })->orderBy('updated_at', 'desc')->limit(1);
+                $join->where($model->getVersionTable().'.updated_at', '<=', $moment)
+                     ->orderBy($model->getVersionTable().'.updated_at', 'desc')
+                     ->limit(1);
+            })
+                    ->orderBy($model->getVersionTable().'.updated_at', 'desc')
+                    ->limit(1);
 
             return $builder;
         });
@@ -138,12 +149,12 @@ class VersioningScope implements Scope
      * Determine if the given join clause is a version constraint.
      *
      * @param  \Illuminate\Database\Query\JoinClause   $join
-     * @param  string  $column
+     * @param  string  $table
      * @return bool
      */
-    protected function isVersionJoinConstraint(JoinClause $join, $table)
+    protected function isVersionJoinConstraint(JoinClause $join, $table): bool
     {
-        return $join->type == 'inner' && $join->table == $table;
+        return $join->type === 'inner' && $join->table === $table;
     }
 
     /**
@@ -151,9 +162,10 @@ class VersioningScope implements Scope
      *
      * @param Builder $builder
      * @param string $table
+     *
      * @return bool
      */
-    protected function hasVersionJoin(Builder $builder, string $table)
+    protected function hasVersionJoin(Builder $builder, string $table): bool
     {
         return collect($builder->getQuery()->joins)->pluck('table')->contains($table);
     }

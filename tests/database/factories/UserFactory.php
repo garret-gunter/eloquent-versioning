@@ -9,6 +9,7 @@ use ProAI\Versioning\Tests\Models\User;
 |--------------------------------------------------------------------------
 |
 */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(User::class, function (Faker $faker) {
     return [
         'email'         => $faker->unique()->safeEmail,

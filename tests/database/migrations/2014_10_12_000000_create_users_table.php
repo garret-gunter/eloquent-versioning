@@ -17,7 +17,7 @@ class CreateUsersTable extends Migration
             $table->increments('id');
             $table->integer('latest_version');
             $table->string('username');
-            $table->timestamp('created_at');
+            $table->timestamps();
         });
 
         Schema::create('users_version', function(Blueprint $table) {

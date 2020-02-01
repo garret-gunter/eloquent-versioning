@@ -2,8 +2,13 @@
 
 namespace ProAI\Versioning;
 
-use Exception;
+use Illuminate\Database\Eloquent\Model;
+use ProAI\Versioning\Exceptions\VersioningException;
 
+/**
+ * Trait BuilderTrait
+ * @package ProAI\Versioning
+ */
 trait BuilderTrait
 {
     /**
@@ -32,8 +37,10 @@ trait BuilderTrait
     /**
      * Insert a new record into the database.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return bool
+     * @throws \ProAI\Versioning\Exceptions\VersioningException
      */
     public function insert(array $values)
     {
@@ -53,16 +60,18 @@ trait BuilderTrait
         $versionValues[$this->model->getVersionColumn()] = 1;
 
         // insert version table record
-        $db = $this->model->getConnection();
+        $db = $this->query->getConnection();
         return $db->table($this->model->getVersionTable())->insert($versionValues);
     }
 
     /**
      * Insert a new record and get the value of the primary key.
      *
-     * @param  array   $values
-     * @param  string  $sequence
+     * @param array  $values
+     * @param string $sequence
+     *
      * @return int
+     * @throws \ProAI\Versioning\Exceptions\VersioningException
      */
     public function insertGetId(array $values, $sequence = null)
     {
@@ -83,7 +92,7 @@ trait BuilderTrait
         $versionValues[$this->model->getVersionKeyName()] = $id;
 
         // insert version table record
-        $db = $this->model->getConnection();
+        $db = $this->query->getConnection();
         if (! $db->table($this->model->getVersionTable())->insert($versionValues)) {
             return false;
         }
@@ -97,8 +106,10 @@ trait BuilderTrait
     /**
      * Update a record in the database.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return int
+     * @throws \ProAI\Versioning\Exceptions\VersioningException
      */
     public function update(array $values)
     {
@@ -118,11 +129,14 @@ trait BuilderTrait
         }
 
         // update version table records
-        $db = $this->model->getConnection();
+        $db = $this->query->getConnection();
         foreach ($affectedRecords as $record) {
+            $recordVersionValues = [];
+            $wrappedRecord = $this->wrapRecord($record);
+
             // get versioned values from record
             foreach($this->model->getVersionedAttributeNames() as $key) {
-                $recordVersionValues[$key] = (isset($versionValues[$key])) ? $versionValues[$key] : array_get($record->getAttributes(), $key);
+                $recordVersionValues[$key] = $versionValues[$key] ?? $wrappedRecord[$key] ?? null;
             }
 
             // merge versioned values from record and input
@@ -139,7 +153,7 @@ trait BuilderTrait
         }
 
         // fill the latest version value
-        $this->model->{$this->model->getLatestVersionColumn()} += 1;
+        $this->model->{$this->model->getLatestVersionColumn()}++;
 
         return true;
     }
@@ -155,7 +169,7 @@ trait BuilderTrait
             return call_user_func($this->onDelete, $this);
         }
 
-        $this->forceDelete();
+        return $this->forceDelete();
     }
 
     /**
@@ -177,7 +191,7 @@ trait BuilderTrait
         }
 
         // delete version table records
-        $db = $this->model->getConnection();
+        $db = $this->query->getConnection();
         return $db->table($this->model->getVersionTable())
             ->whereIn($this->model->getVersionKeyName(), $ids)
             ->delete();
@@ -186,7 +200,7 @@ trait BuilderTrait
     /**
      * Get affected records.
      *
-     * @return array
+     * @return array|\Illuminate\Support\Collection
      */
     protected function getAffectedRecords()
     {
@@ -194,7 +208,6 @@ trait BuilderTrait
         if ($this->model->getKey()) {
             $records = [$this->model];
         }
-
         // mass assignment
         else {
             $records = $this->query->get()->toArray();
@@ -206,10 +219,12 @@ trait BuilderTrait
     /**
      * Get affected ids.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return array
+     * @throws \ProAI\Versioning\Exceptions\VersioningException
      */
-    protected function getValues(array $values)
+    protected function getValues(array $values): array
     {
         $array = [];
 
@@ -230,10 +245,12 @@ trait BuilderTrait
     /**
      * Get affected ids.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return array
+     * @throws \ProAI\Versioning\Exceptions\VersioningException
      */
-    protected function getVersionValues(array $values)
+    protected function getVersionValues(array $values): array
     {
         $array = [];
 
@@ -251,16 +268,18 @@ trait BuilderTrait
     /**
      * Check if key is in versioned keys.
      *
-     * @param  string  $key
-     * @param  array  $versionedKeys
+     * @param string $key
+     * @param array  $versionedKeys
+     *
      * @return string|null
+     * @throws \ProAI\Versioning\Exceptions\VersioningException
      */
-    protected function isVersionedKey($key, array $versionedKeys)
+    protected function isVersionedKey($key, array $versionedKeys): ?string
     {
-        $segments = explode(".",$key);
+        $segments = explode('.', $key);
 
         if (count($segments) > 2) {
-            throw new Exception("Key '".$key."' has too many fractions.");
+            throw new VersioningException("Key '".$key."' has too many fractions.");
         }
 
         if (count($segments) == 1 && in_array($segments[0], $versionedKeys)) {
@@ -274,4 +293,15 @@ trait BuilderTrait
         return null;
     }
 
+	/**
+	 * Wrap record so we can access the correct values.
+	 *
+	 * @param object|Model $record
+	 *
+	 * @return \ArrayObject
+	 */
+	protected function wrapRecord($record): \ArrayObject
+	{
+		return new \ArrayObject($record instanceof  Model ? $record->getAttributes() : $record);
+    }
 }

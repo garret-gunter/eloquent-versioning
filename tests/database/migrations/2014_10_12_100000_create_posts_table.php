@@ -17,8 +17,8 @@ class CreatePostsTable extends Migration
             $table->increments('id');
             $table->integer('latest_version');
             $table->string('title');
-            $table->timestamp('created_at');
             $table->softDeletes();
+	        $table->timestamps();
         });
 
         Schema::create('posts_version', function(Blueprint $table) {

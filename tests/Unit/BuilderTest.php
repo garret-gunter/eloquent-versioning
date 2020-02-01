@@ -1,36 +1,44 @@
 <?php
 
-namespace ProAI\Versioning\Tests;
+namespace ProAI\Versioning\Tests\Unit;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use ProAI\Versioning\Tests\Models\Post;
 use ProAI\Versioning\Tests\Models\User;
+use ProAI\Versioning\Tests\TestCase;
 
+/**
+ * Class BuilderTest
+ * @package ProAI\Versioning\Tests
+ */
 class BuilderTest extends TestCase
 {
     /**
      * @test
      */
-    public function itWillRetrieveVersionedAttributes()
+    public function itWillRetrieveVersionedAttributes(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([]);
 
-        $this->assertArraySubset([
+        $this->assertEquals([
             'username'          => $model->username,
             'email'             => $model->email,
             'city'              => $model->city,
             'latest_version'    => $model->latest_version,
             'updated_at'        => $model->updated_at,
-            'created_at'        => $model->created_at
+            'created_at'        => $model->created_at,
+            'id'                => $model->id,
+            'version'           => 1,
+            'deleted_at'        => null,
         ], User::first()->toArray());
     }
 
     /**
      * @test
      */
-    public function itWillRetrieveTheLatestVersionedAttributes()
+    public function itWillRetrieveTheLatestVersionedAttributes(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([]);
@@ -39,15 +47,66 @@ class BuilderTest extends TestCase
             'city'  => 'Citadel'
         ]);
 
-        $this->assertArraySubset([
-            'latest_version' => 2,
-        ], User::first()->toArray());
+        $first = User::first();
+        $this->assertNotNull($first);
+
+        $this->assertEquals(2, $first->latest_version);
+        $this->assertEquals('Citadel', $first->city);
     }
 
     /**
      * @test
      */
-    public function itWillRetrieveTheCorrectVersionsAttributes()
+    public function itWillRetrieveTheCorrectVersionsAttributes(): void
+    {
+    	$now = now();
+
+        /** @var User $model */
+        $model = factory(User::class)->create([]);
+        $city = $model->city;
+
+        // Version 2 is tomorrow.
+        $tomorrow = (clone $now)->addDay();
+        Carbon::setTestNow($tomorrow);
+
+        $model->update([
+            'city'  => 'Citadel'
+        ]);
+
+        // Version 3 is the day after tomorrow.
+        $nextDay = (clone $tomorrow)->addDay();
+	    Carbon::setTestNow($nextDay);
+
+        $model->update([
+            'city'  => 'Ricklantis'
+        ]);
+
+        // Reset Carbon now
+	    Carbon::setTestNow();
+
+        $version1 = User::version(1)->find($model->id);
+	    $this->assertEquals(1, $version1->version);
+        $this->assertEquals($city, $version1->city);
+        $this->assertTrue($version1->updated_at->eq($model->created_at));
+        $this->assertTrue($version1->updated_at->isBefore($model->updated_at));
+
+	    $version2 = User::version(2)->find($model->id);
+	    $this->assertEquals(2, $version2->version);
+	    $this->assertEquals('Citadel', $version2->city);
+	    $this->assertTrue($version2->updated_at->isAfter($model->created_at));
+	    $this->assertTrue($version2->updated_at->isBefore($model->updated_at));
+
+	    $version3 = User::version(3)->find($model->id);
+	    $this->assertEquals(3, $version3->version);
+	    $this->assertEquals('Ricklantis', $version3->city);
+	    $this->assertTrue($version3->updated_at->isAfter($model->created_at));
+	    $this->assertTrue($version3->updated_at->equalTo($model->updated_at));
+    }
+
+    /**
+     * @test
+     */
+    public function itWillRetrieveAllVersions(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([]);
@@ -61,56 +120,29 @@ class BuilderTest extends TestCase
             'city'  => 'Ricklantis'
         ]);
 
-        $this->assertArraySubset([
-            'city' => $city,
-            'version' => 1
-        ], User::version(1)->find($model->id)->toArray());
+        $versions = User::allVersions()->get()->toArray();
+        $this->assertCount(3,$versions);
 
-        $this->assertArraySubset([
-            'city' => 'Citadel',
-            'version' => 2
-        ], User::version(2)->find($model->id)->toArray());
+        $expected = [
+        	// Version 1
+        	1  => $city,
+	        // Version 2
+	        2 => 'Citadel',
+	        // Version 3
+	        3 => 'Ricklantis',
+        ];
 
-        $this->assertArraySubset([
-            'city' => 'Ricklantis',
-            'version' => 3
-        ], User::version(3)->find($model->id)->toArray());
+        foreach($versions as $modelVersion){
+        	$this->assertArrayHasKey('version', $modelVersion);
+        	$version = $modelVersion['version'];
+        	$this->assertEquals($expected[(int) $version], $modelVersion['city']);
+        }
     }
 
     /**
      * @test
      */
-    public function itWillRetrieveAllVersions()
-    {
-        /** @var User $model */
-        $model = factory(User::class)->create([]);
-        $city = $model->city;
-
-        $model->update([
-            'city'  => 'Citadel'
-        ]);
-
-        $model->update([
-            'city'  => 'Ricklantis'
-        ]);
-
-        $this->assertArraySubset([
-            [
-                'city' => $city
-            ],
-            [
-                'city' => 'Citadel'
-            ],
-            [
-                'city' => 'Ricklantis'
-            ]
-        ], User::allVersions()->get()->toArray());
-    }
-
-    /**
-     * @test
-     */
-    public function itWillRetrieveTheCorrectMomentsAttributes()
+    public function itWillRetrieveTheCorrectMomentsAttributes(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([
@@ -134,23 +166,20 @@ class BuilderTest extends TestCase
             'updated_at'    => $date->copy()->addDays(2)
         ]);
 
-        $this->assertArraySubset([
-            'version' => 1
-        ], User::moment($date)->find($model->id)->toArray());
+        $version1 = User::moment($date)->find($model->id);
+        $this->assertEquals(1,$version1->version);
 
-        $this->assertArraySubset([
-            'version' => 2
-        ], User::moment($date->copy()->addDays(1))->find($model->id)->toArray());
+        $version2 = User::moment($date->copy()->addDays(1))->find($model->id);
+        $this->assertEquals(2, $version2->version);
 
-        $this->assertArraySubset([
-            'version' => 3
-        ], User::moment($date->copy()->addDays(2))->find($model->id)->toArray());
+	    $version3 = User::moment($date->copy()->addDays(2))->find($model->id);
+        $this->assertEquals(3, $version3->version);
     }
 
     /**
      * @test
      */
-    public function itWillRemovePreviousJoins()
+    public function itWillRemovePreviousJoins(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([]);
@@ -177,7 +206,7 @@ class BuilderTest extends TestCase
      * @dataProvider modelProvider
      * @param string $model
      */
-    public function itWillDeleteTheVersionedTable(string $model)
+    public function itWillDeleteTheVersionedTable(string $model): void
     {
         factory($model)->create([]);
         factory($model)->create([]);
@@ -193,7 +222,7 @@ class BuilderTest extends TestCase
      * @dataProvider modelProvider
      * @param string $model
      */
-    public function itWillForceDeleteTheVersionedTable(string $model)
+    public function itWillForceDeleteTheVersionedTable(string $model): void
     {
         factory($model)->create([]);
         factory($model)->create([]);
@@ -203,7 +232,10 @@ class BuilderTest extends TestCase
         $this->assertEquals(0, User::all()->count());
     }
 
-    public function modelProvider()
+	/**
+	 * @return array
+	 */
+    public function modelProvider(): array
     {
         return [
             [

@@ -2,6 +2,17 @@
 
 namespace ProAI\Versioning;
 
+use Illuminate\Support\Arr;
+
+/**
+ * Trait Versionable
+ * @package ProAI\Versioning
+ * @mixin \Illuminate\Database\Eloquent\Model
+ *
+ * @method static static|\Illuminate\Database\Eloquent\Builder|Builder version($version)
+ * @method static static|\Illuminate\Database\Eloquent\Builder|Builder allVersions()
+ * @method static static|\Illuminate\Database\Eloquent\Builder|Builder moment(\Carbon\Carbon $moment)
+ */
 trait Versionable
 {
     /**
@@ -9,7 +20,7 @@ trait Versionable
      *
      * @return void
      */
-    public static function bootVersionable()
+    public static function bootVersionable(): void
     {
         static::addGlobalScope(new VersioningScope);
     }
@@ -19,12 +30,12 @@ trait Versionable
      *
      * @param  array  $attributes
      * @param  string|null  $connection
-     * @return static
+     * @return static|\Illuminate\Database\Eloquent\Model
      */
     public function newFromBuilder($attributes = array(), $connection = null)
     {
         // hide ref_id from model, because ref_id == id
-        $attributes = array_except((array) $attributes, $this->getVersionKeyName());
+        $attributes = Arr::except((array) $attributes, $this->getVersionKeyName());
 
         return parent::newFromBuilder($attributes, $connection);
     }
@@ -45,7 +56,7 @@ trait Versionable
      *
      * @return array
      */
-    public function getVersionedAttributeNames()
+    public function getVersionedAttributeNames(): array
     {
         return (! empty($this->versioned)) ? $this->versioned : [];
     }
@@ -55,7 +66,7 @@ trait Versionable
      *
      * @return string
      */
-    public function getVersionKeyName()
+    public function getVersionKeyName(): string
     {
         return 'ref_' . $this->getKeyName();
     }
@@ -65,7 +76,7 @@ trait Versionable
      *
      * @return string
      */
-    public function getVersionTable()
+    public function getVersionTable(): string
     {
         return $this->getTable() . '_version';
     }
@@ -75,7 +86,7 @@ trait Versionable
      *
      * @return string
      */
-    public function getQualifiedVersionKeyName()
+    public function getQualifiedVersionKeyName(): string
     {
         return $this->getVersionTable().'.'.$this->getVersionKeyName();
     }
@@ -85,7 +96,7 @@ trait Versionable
      *
      * @return string
      */
-    public function getLatestVersionColumn()
+    public function getLatestVersionColumn(): string
     {
         return defined('static::LATEST_VERSION') ? static::LATEST_VERSION : 'latest_version';
     }
@@ -95,7 +106,7 @@ trait Versionable
      *
      * @return string
      */
-    public function getQualifiedLatestVersionColumn()
+    public function getQualifiedLatestVersionColumn(): string
     {
         return $this->getTable().'.'.$this->getLatestVersionColumn();
     }
@@ -105,7 +116,7 @@ trait Versionable
      *
      * @return string
      */
-    public function getVersionColumn()
+    public function getVersionColumn(): string
     {
         return defined('static::VERSION') ? static::VERSION : 'version';
     }
@@ -115,7 +126,7 @@ trait Versionable
      *
      * @return string
      */
-    public function getQualifiedVersionColumn()
+    public function getQualifiedVersionColumn(): string
     {
         return $this->getVersionTable().'.'.$this->getVersionColumn();
     }

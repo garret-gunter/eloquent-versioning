@@ -3,10 +3,27 @@
 namespace ProAI\Versioning\Tests\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-
 use ProAI\Versioning\Versionable;
 use ProAI\Versioning\SoftDeletes;
 
+/**
+ * Class User
+ *
+ * @package ProAI\Versioning\Tests\Models
+ *
+ * @property int $id
+ * @property string $city
+ * @property string $email
+ * @property string $latest_version
+ * @property string $password
+ * @property string $remember_token
+ * @property string $username
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ *
+ * @mixin \Illuminate\Database\Eloquent\Builder
+ */
 class User extends Authenticatable
 {
     use Versionable, SoftDeletes;

@@ -4,6 +4,11 @@ namespace ProAI\Versioning;
 
 use Illuminate\Database\Eloquent\SoftDeletes as SoftDeletesTrait;
 
+/**
+ * Trait SoftDeletes
+ *
+ * @package ProAI\Versioning
+ */
 trait SoftDeletes
 {
     use SoftDeletesTrait;

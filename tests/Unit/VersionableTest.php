@@ -1,17 +1,22 @@
 <?php
 
-namespace ProAI\Versioning\Tests;
+namespace ProAI\Versioning\Tests\Unit;
 
 use Carbon\Carbon;
 use ProAI\Versioning\Tests\Models\User;
 use ProAI\Versioning\Tests\TestCase;
 
+/**
+ * Class VersionableTest
+ *
+ * @package ProAI\Versioning\Tests\Unit
+ */
 class VersionableTest extends TestCase
 {
     /**
- * @test
- */
-    public function itWillVersionModelsWhenCreating()
+    * @test
+    */
+    public function itWillVersionModelsWhenCreating(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([]);
@@ -32,7 +37,7 @@ class VersionableTest extends TestCase
     /**
     * @test
     */
-    public function itWillVersionModelsWhenUpdating()
+    public function itWillVersionModelsWhenUpdating(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([]);
@@ -64,7 +69,7 @@ class VersionableTest extends TestCase
     /**
      * @test
      */
-    public function itWillVersionModelsWhenSaving()
+    public function itWillVersionModelsWhenSaving(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([]);
@@ -95,7 +100,7 @@ class VersionableTest extends TestCase
     /**
      * @test
      */
-    public function itWillVersionModelsWhenInserting()
+    public function itWillVersionModelsWhenInserting(): void
     {
         /** @var User $model */
         $model = factory(User::class)->make([]);
@@ -120,7 +125,7 @@ class VersionableTest extends TestCase
     /**
      * @test
      */
-    public function itWillUpdateTheLatestVersionWhenCreating()
+    public function itWillUpdateTheLatestVersionWhenCreating(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([]);
@@ -131,7 +136,7 @@ class VersionableTest extends TestCase
     /**
      * @test
      */
-    public function itWillUpdateTheLatestVersionWhenUpdating()
+    public function itWillUpdateTheLatestVersionWhenUpdating(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([]);
@@ -146,7 +151,7 @@ class VersionableTest extends TestCase
     /**
      * @test
      */
-    public function itWillUpdateTheLatestVersionWhenSaving()
+    public function itWillUpdateTheLatestVersionWhenSaving(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([]);
@@ -160,7 +165,7 @@ class VersionableTest extends TestCase
     /**
      * @test
      */
-    public function itWillOnlyVersionVersionedAttributes()
+    public function itWillOnlyVersionVersionedAttributes(): void
     {
         /** @var User $model */
         $model = factory(User::class)->create([]);
