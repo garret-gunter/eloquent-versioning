@@ -1,7 +1,5 @@
 checks:
-  php:
-    code_rating: true
-    duplication: true
+  php: true
 
 filter:
   excluded_paths:
@@ -9,6 +7,10 @@ filter:
 
 build:
   nodes:
+    analysis:
+      tests:
+        override:
+          - command: phpcs-run --config phpcs.xml
     php72:
       environment:
         php:
@@ -16,8 +18,7 @@ build:
       tests:
         override:
           - php-scrutinizer-run
-          -
-            command: vendor/bin/phpunit --coverage-clover=coverage72 --prepend .coverage-filter.php
+          - command: vendor/bin/phpunit --coverage-clover=coverage72 --prepend .coverage-filter.php
             coverage:
               file: coverage72
               format: php-clover
@@ -28,8 +29,7 @@ build:
       tests:
         override:
           - php-scrutinizer-run
-          -
-            command: vendor/bin/phpunit --coverage-clover=coverage73 --prepend .coverage-filter.php
+          - command: vendor/bin/phpunit --coverage-clover=coverage73 --prepend .coverage-filter.php
             coverage:
               file: coverage73
               format: php-clover
@@ -40,8 +40,7 @@ build:
       tests:
         override:
           - php-scrutinizer-run
-          -
-            command: vendor/bin/phpunit --coverage-clover=coverage74 --prepend .coverage-filter.php
+          - command: vendor/bin/phpunit --coverage-clover=coverage74 --prepend .coverage-filter.php
             coverage:
               file: coverage74
               format: php-clover

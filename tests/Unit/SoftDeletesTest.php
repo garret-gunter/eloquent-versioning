@@ -11,99 +11,93 @@ use ProAI\Versioning\Tests\TestCase;
  *
  * @package ProAI\Versioning\Tests
  */
-class SoftDeletesTest extends TestCase
-{
-    /**
-     * @test
-     *
-     * @dataProvider modelProvider
-     * @param string $model
-     * @throws \Exception
-     */
-    public function itWillSaveDeletedAt(string $model): void
-    {
-        $model = factory($model)->create([]);
-        $model->delete();
+class SoftDeletesTest extends TestCase {
 
-        $version = $model::withTrashed()->first();
+	/**
+	 * @test
+	 *
+	 * @dataProvider modelProvider
+	 * @param string $model
+	 * @throws \Exception
+	 */
+	public function itWillSaveDeletedAt(string $model): void {
+		$model = factory($model)->create([]);
+		$model->delete();
 
-        $this->assertEquals($model->id,$version->id);
-        $this->assertEquals($model->deleted_at, $version->deleted_at);
-    }
+		$version = $model::withTrashed()->first();
 
-    /**
-     * @test
-     */
-    public function itWillGetTheCorrectDeletedAtColumnOnTheMainTable(): void
-    {
-        /** @var Post $model */
-        $model = factory(Post::class)->create([]);
+		$this->assertEquals($model->id, $version->id);
+		$this->assertEquals($model->deleted_at, $version->deleted_at);
+	}
 
-        $this->assertEquals('posts.deleted_at', $model->getQualifiedDeletedAtColumn());
-    }
+	/**
+	 * @test
+	 */
+	public function itWillGetTheCorrectDeletedAtColumnOnTheMainTable(): void {
+		/** @var Post $model */
+		$model = factory(Post::class)->create([]);
 
-    /**
-     * @test
-     */
-    public function itWillGetTheCorrectDeletedAtColumnOnTheVersionTable(): void
-    {
-        /** @var User $model */
-        $model = factory(User::class)->create([]);
+		$this->assertEquals('posts.deleted_at', $model->getQualifiedDeletedAtColumn());
+	}
 
-        $this->assertEquals('users_version.deleted_at', $model->getQualifiedDeletedAtColumn());
-    }
+	/**
+	 * @test
+	 */
+	public function itWillGetTheCorrectDeletedAtColumnOnTheVersionTable(): void {
+		/** @var User $model */
+		$model = factory(User::class)->create([]);
 
-    /**
-     * @test
-     * @throws \Exception
-     */
-    public function itWillSaveDeletedAtInTheMainTable(): void
-    {
-        /** @var Post $model */
-        $model = factory(Post::class)->create([]);
-        $model->delete();
+		$this->assertEquals('users_version.deleted_at', $model->getQualifiedDeletedAtColumn());
+	}
 
-        $this->assertDatabaseHas('posts', [
-            'id'            => $model->id,
-            'deleted_at'    => $model->deleted_at
-        ]);
-    }
+	/**
+	 * @test
+	 * @throws \Exception
+	 */
+	public function itWillSaveDeletedAtInTheMainTable(): void {
+		/** @var Post $model */
+		$model = factory(Post::class)->create([]);
+		$model->delete();
 
-    /**
-     * @test
-     * @throws \Exception
-     */
-    public function itWillSaveDeletedAtInTheVersionTable(): void
-    {
-        /** @var User $model */
-        $model = factory(User::class)->create([]);
-        $model->delete();
+		$this->assertDatabaseHas('posts', [
+			'id'            => $model->id,
+			'deleted_at'    => $model->deleted_at
+		]);
+	}
 
-        $this->assertDatabaseHas('users_version', [
-            'ref_id'        => $model->id,
-            'version'       => 1,
-            'deleted_at'    => null
-        ]);
+	/**
+	 * @test
+	 * @throws \Exception
+	 */
+	public function itWillSaveDeletedAtInTheVersionTable(): void {
+		/** @var User $model */
+		$model = factory(User::class)->create([]);
+		$model->delete();
 
-        $this->assertDatabaseHas('users_version', [
-            'ref_id'        => $model->id,
-            'version'       => 2,
-            'deleted_at'    => $model->deleted_at->format('Y-m-d H:i:s')
-        ]);
-    }
+		$this->assertDatabaseHas('users_version', [
+			'ref_id'        => $model->id,
+			'version'       => 1,
+			'deleted_at'    => null
+		]);
+
+		$this->assertDatabaseHas('users_version', [
+			'ref_id'        => $model->id,
+			'version'       => 2,
+			'deleted_at'    => $model->deleted_at->format('Y-m-d H:i:s')
+		]);
+	}
 
 	/**
 	 * @return array
 	 */
-	public function modelProvider(): array
-    {
-        return [
-            [
-                User::class
-            ],
-            [
-                Post::class
-            ]
-        ];
-    }
+	public function modelProvider(): array {
+		return [
+			[
+				User::class
+			],
+			[
+				Post::class
+			]
+		];
+	}
 }

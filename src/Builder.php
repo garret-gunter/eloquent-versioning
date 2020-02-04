@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Builder as BaseBuilder;
  *
  * @package ProAI\Versioning
  */
-class Builder extends BaseBuilder
-{
-    use BuilderTrait;
+class Builder extends BaseBuilder {
+	use BuilderTrait;
 }

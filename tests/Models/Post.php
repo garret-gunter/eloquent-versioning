@@ -3,7 +3,6 @@
 namespace ProAI\Versioning\Tests\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-
 use ProAI\Versioning\Versionable;
 use ProAI\Versioning\SoftDeletes;
 
@@ -20,20 +19,20 @@ use ProAI\Versioning\SoftDeletes;
  *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
-class Post extends Authenticatable
-{
-    use Versionable, SoftDeletes;
+class Post extends Authenticatable {
+	use Versionable;
+	use SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'title', 'content'
-    ];
+	/**
+	 * The attributes that are mass assignable.
+	 *
+	 * @var array
+	 */
+	protected $fillable = [
+		'title', 'content'
+	];
 
-    public $timestamps = true;
+	public $timestamps = true;
 
-    public $versioned = ['content', 'updated_at'];
+	public $versioned = ['content', 'updated_at'];
 }

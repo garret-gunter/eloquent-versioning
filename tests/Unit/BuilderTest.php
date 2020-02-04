@@ -12,238 +12,229 @@ use ProAI\Versioning\Tests\TestCase;
  * Class BuilderTest
  * @package ProAI\Versioning\Tests
  */
-class BuilderTest extends TestCase
-{
-    /**
-     * @test
-     */
-    public function itWillRetrieveVersionedAttributes(): void
-    {
-        /** @var User $model */
-        $model = factory(User::class)->create([]);
+class BuilderTest extends TestCase {
 
-        $this->assertEquals([
-            'username'          => $model->username,
-            'email'             => $model->email,
-            'city'              => $model->city,
-            'latest_version'    => $model->latest_version,
-            'updated_at'        => $model->updated_at,
-            'created_at'        => $model->created_at,
-            'id'                => $model->id,
-            'version'           => 1,
-            'deleted_at'        => null,
-        ], User::first()->toArray());
-    }
+	/**
+	 * @test
+	 */
+	public function itWillRetrieveVersionedAttributes(): void {
+		/** @var User $model */
+		$model = factory(User::class)->create([]);
 
-    /**
-     * @test
-     */
-    public function itWillRetrieveTheLatestVersionedAttributes(): void
-    {
-        /** @var User $model */
-        $model = factory(User::class)->create([]);
+		$this->assertEquals([
+			'username'          => $model->username,
+			'email'             => $model->email,
+			'city'              => $model->city,
+			'latest_version'    => $model->latest_version,
+			'updated_at'        => $model->updated_at,
+			'created_at'        => $model->created_at,
+			'id'                => $model->id,
+			'version'           => 1,
+			'deleted_at'        => null,
+		], User::first()->toArray());
+	}
 
-        $model->update([
-            'city'  => 'Citadel'
-        ]);
+	/**
+	 * @test
+	 */
+	public function itWillRetrieveTheLatestVersionedAttributes(): void {
+		/** @var User $model */
+		$model = factory(User::class)->create([]);
 
-        $first = User::first();
-        $this->assertNotNull($first);
+		$model->update([
+			'city'  => 'Citadel'
+		]);
 
-        $this->assertEquals(2, $first->latest_version);
-        $this->assertEquals('Citadel', $first->city);
-    }
+		$first = User::first();
+		$this->assertNotNull($first);
 
-    /**
-     * @test
-     */
-    public function itWillRetrieveTheCorrectVersionsAttributes(): void
-    {
-    	$now = now();
+		$this->assertEquals(2, $first->latest_version);
+		$this->assertEquals('Citadel', $first->city);
+	}
 
-        /** @var User $model */
-        $model = factory(User::class)->create([]);
-        $city = $model->city;
+	/**
+	 * @test
+	 */
+	public function itWillRetrieveTheCorrectVersionsAttributes(): void {
+		$now = now();
 
-        // Version 2 is tomorrow.
-        $tomorrow = (clone $now)->addDay();
-        Carbon::setTestNow($tomorrow);
+		/** @var User $model */
+		$model = factory(User::class)->create([]);
+		$city = $model->city;
 
-        $model->update([
-            'city'  => 'Citadel'
-        ]);
+		// Version 2 is tomorrow.
+		$tomorrow = (clone $now)->addDay();
+		Carbon::setTestNow($tomorrow);
 
-        // Version 3 is the day after tomorrow.
-        $nextDay = (clone $tomorrow)->addDay();
-	    Carbon::setTestNow($nextDay);
+		$model->update([
+			'city'  => 'Citadel'
+		]);
 
-        $model->update([
-            'city'  => 'Ricklantis'
-        ]);
+		// Version 3 is the day after tomorrow.
+		$nextDay = (clone $tomorrow)->addDay();
+		Carbon::setTestNow($nextDay);
 
-        // Reset Carbon now
-	    Carbon::setTestNow();
+		$model->update([
+			'city'  => 'Ricklantis'
+		]);
 
-        $version1 = User::version(1)->find($model->id);
-	    $this->assertEquals(1, $version1->version);
-        $this->assertEquals($city, $version1->city);
-        $this->assertTrue($version1->updated_at->eq($model->created_at));
-        $this->assertTrue($version1->updated_at->isBefore($model->updated_at));
+		// Reset Carbon now
+		Carbon::setTestNow();
 
-	    $version2 = User::version(2)->find($model->id);
-	    $this->assertEquals(2, $version2->version);
-	    $this->assertEquals('Citadel', $version2->city);
-	    $this->assertTrue($version2->updated_at->isAfter($model->created_at));
-	    $this->assertTrue($version2->updated_at->isBefore($model->updated_at));
+		$version1 = User::version(1)->find($model->id);
+		$this->assertEquals(1, $version1->version);
+		$this->assertEquals($city, $version1->city);
+		$this->assertTrue($version1->updated_at->eq($model->created_at));
+		$this->assertTrue($version1->updated_at->isBefore($model->updated_at));
 
-	    $version3 = User::version(3)->find($model->id);
-	    $this->assertEquals(3, $version3->version);
-	    $this->assertEquals('Ricklantis', $version3->city);
-	    $this->assertTrue($version3->updated_at->isAfter($model->created_at));
-	    $this->assertTrue($version3->updated_at->equalTo($model->updated_at));
-    }
+		$version2 = User::version(2)->find($model->id);
+		$this->assertEquals(2, $version2->version);
+		$this->assertEquals('Citadel', $version2->city);
+		$this->assertTrue($version2->updated_at->isAfter($model->created_at));
+		$this->assertTrue($version2->updated_at->isBefore($model->updated_at));
 
-    /**
-     * @test
-     */
-    public function itWillRetrieveAllVersions(): void
-    {
-        /** @var User $model */
-        $model = factory(User::class)->create([]);
-        $city = $model->city;
+		$version3 = User::version(3)->find($model->id);
+		$this->assertEquals(3, $version3->version);
+		$this->assertEquals('Ricklantis', $version3->city);
+		$this->assertTrue($version3->updated_at->isAfter($model->created_at));
+		$this->assertTrue($version3->updated_at->equalTo($model->updated_at));
+	}
 
-        $model->update([
-            'city'  => 'Citadel'
-        ]);
+	/**
+	 * @test
+	 */
+	public function itWillRetrieveAllVersions(): void {
+		/** @var User $model */
+		$model = factory(User::class)->create([]);
+		$city = $model->city;
 
-        $model->update([
-            'city'  => 'Ricklantis'
-        ]);
+		$model->update([
+			'city'  => 'Citadel'
+		]);
 
-        $versions = User::allVersions()->get()->toArray();
-        $this->assertCount(3,$versions);
+		$model->update([
+			'city'  => 'Ricklantis'
+		]);
 
-        $expected = [
-        	// Version 1
-        	1  => $city,
-	        // Version 2
-	        2 => 'Citadel',
-	        // Version 3
-	        3 => 'Ricklantis',
-        ];
+		$versions = User::allVersions()->get()->toArray();
+		$this->assertCount(3, $versions);
 
-        foreach($versions as $modelVersion){
-        	$this->assertArrayHasKey('version', $modelVersion);
-        	$version = $modelVersion['version'];
-        	$this->assertEquals($expected[(int) $version], $modelVersion['city']);
-        }
-    }
+		$expected = [
+			// Version 1
+			1  => $city,
+			// Version 2
+			2 => 'Citadel',
+			// Version 3
+			3 => 'Ricklantis',
+		];
 
-    /**
-     * @test
-     */
-    public function itWillRetrieveTheCorrectMomentsAttributes(): void
-    {
-        /** @var User $model */
-        $model = factory(User::class)->create([
-            'updated_at' => Carbon::now()->subDays(2)
-        ]);
-        $date = $model->created_at;
+		foreach ($versions as $modelVersion) {
+			$this->assertArrayHasKey('version', $modelVersion);
+			$version = $modelVersion['version'];
+			$this->assertEquals($expected[(int) $version], $modelVersion['city']);
+		}
+	}
 
-        DB::table('users_version')->insert([
-            'ref_id'        => 1,
-            'version'       => 2,
-            'email'         => $model->email,
-            'city'          => 'Citadel',
-            'updated_at'    => $date->copy()->addDays(1)
-        ]);
+	/**
+	 * @test
+	 */
+	public function itWillRetrieveTheCorrectMomentsAttributes(): void {
+		/** @var User $model */
+		$model = factory(User::class)->create([
+			'updated_at' => Carbon::now()->subDays(2)
+		]);
+		$date = $model->created_at;
 
-        DB::table('users_version')->insert([
-            'ref_id'        => 1,
-            'version'       => 3,
-            'email'         => $model->email,
-            'city'          => 'Ricklantis',
-            'updated_at'    => $date->copy()->addDays(2)
-        ]);
+		DB::table('users_version')->insert([
+			'ref_id'        => 1,
+			'version'       => 2,
+			'email'         => $model->email,
+			'city'          => 'Citadel',
+			'updated_at'    => $date->copy()->addDays(1)
+		]);
 
-        $version1 = User::moment($date)->find($model->id);
-        $this->assertEquals(1,$version1->version);
+		DB::table('users_version')->insert([
+			'ref_id'        => 1,
+			'version'       => 3,
+			'email'         => $model->email,
+			'city'          => 'Ricklantis',
+			'updated_at'    => $date->copy()->addDays(2)
+		]);
 
-        $version2 = User::moment($date->copy()->addDays(1))->find($model->id);
-        $this->assertEquals(2, $version2->version);
+		$version1 = User::moment($date)->find($model->id);
+		$this->assertEquals(1, $version1->version);
 
-	    $version3 = User::moment($date->copy()->addDays(2))->find($model->id);
-        $this->assertEquals(3, $version3->version);
-    }
+		$version2 = User::moment($date->copy()->addDays(1))->find($model->id);
+		$this->assertEquals(2, $version2->version);
 
-    /**
-     * @test
-     */
-    public function itWillRemovePreviousJoins(): void
-    {
-        /** @var User $model */
-        $model = factory(User::class)->create([]);
-        $city = $model->city;
+		$version3 = User::moment($date->copy()->addDays(2))->find($model->id);
+		$this->assertEquals(3, $version3->version);
+	}
 
-        $model->update([
-            'city'  => 'Citadel'
-        ]);
+	/**
+	 * @test
+	 */
+	public function itWillRemovePreviousJoins(): void {
+		/** @var User $model */
+		$model = factory(User::class)->create([]);
+		$city = $model->city;
 
-        $builder = User::version(1);
+		$model->update([
+			'city'  => 'Citadel'
+		]);
 
-        // It should have one join right now
-        $this->assertEquals(1, collect($builder->getQuery()->joins)->where('table', '=', 'users_version')->count());
+		$builder = User::version(1);
 
-        $builder->version(2);
+		// It should have one join right now
+		$this->assertEquals(1, collect($builder->getQuery()->joins)->where('table', '=', 'users_version')->count());
 
-        // It should still have one join right now
-        $this->assertEquals(1, collect($builder->getQuery()->joins)->where('table', '=', 'users_version')->count());
-    }
+		$builder->version(2);
 
-    /**
-     * @test
-     *
-     * @dataProvider modelProvider
-     * @param string $model
-     */
-    public function itWillDeleteTheVersionedTable(string $model): void
-    {
-        factory($model)->create([]);
-        factory($model)->create([]);
+		// It should still have one join right now
+		$this->assertEquals(1, collect($builder->getQuery()->joins)->where('table', '=', 'users_version')->count());
+	}
 
-        $model::version(1)->delete();
+	/**
+	 * @test
+	 *
+	 * @dataProvider modelProvider
+	 * @param string $model
+	 */
+	public function itWillDeleteTheVersionedTable(string $model): void {
+		factory($model)->create([]);
+		factory($model)->create([]);
 
-        $this->assertEquals(0, User::all()->count());
-    }
+		$model::version(1)->delete();
 
-    /**
-     * @test
-     *
-     * @dataProvider modelProvider
-     * @param string $model
-     */
-    public function itWillForceDeleteTheVersionedTable(string $model): void
-    {
-        factory($model)->create([]);
-        factory($model)->create([]);
+		$this->assertEquals(0, User::all()->count());
+	}
 
-        $model::version(1)->forceDelete();
+	/**
+	 * @test
+	 *
+	 * @dataProvider modelProvider
+	 * @param string $model
+	 */
+	public function itWillForceDeleteTheVersionedTable(string $model): void {
+		factory($model)->create([]);
+		factory($model)->create([]);
 
-        $this->assertEquals(0, User::all()->count());
-    }
+		$model::version(1)->forceDelete();
+
+		$this->assertEquals(0, User::all()->count());
+	}
 
 	/**
 	 * @return array
 	 */
-    public function modelProvider(): array
-    {
-        return [
-            [
-                User::class
-            ],
-            [
-                Post::class
-            ]
-        ];
-    }
+	public function modelProvider(): array {
+		return [
+			[
+				User::class
+			],
+			[
+				Post::class
+			]
+		];
+	}
 }
