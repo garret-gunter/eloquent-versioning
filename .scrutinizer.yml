@@ -10,7 +10,9 @@ build:
     analysis:
       tests:
         override:
-          - phpcs-run
+          - php-scrutinizer-run
+          - command: phpcs-run
+            use_website_config: false
     php72:
       environment:
         php:
@@ -18,10 +20,7 @@ build:
       tests:
         override:
           - php-scrutinizer-run
-          - command: vendor/bin/phpunit --coverage-clover=coverage72 --prepend .coverage-filter.php
-            coverage:
-              file: coverage72
-              format: php-clover
+          - command: vendor/bin/phpunit --prepend .coverage-filter.php
     php73:
       environment:
         php:
@@ -29,10 +28,7 @@ build:
       tests:
         override:
           - php-scrutinizer-run
-          - command: vendor/bin/phpunit --coverage-clover=coverage73 --prepend .coverage-filter.php
-            coverage:
-              file: coverage73
-              format: php-clover
+          - command: vendor/bin/phpunit --prepend .coverage-filter.php
     php74:
       environment:
         php:
@@ -40,7 +36,7 @@ build:
       tests:
         override:
           - php-scrutinizer-run
-          - command: vendor/bin/phpunit --coverage-clover=coverage74 --prepend .coverage-filter.php
+          - command: ./vendor/bin/phpunit --coverage-clover=my-coverage-file --prepend .coverage-filter.php
             coverage:
-              file: coverage74
+              file: my-coverage-file
               format: php-clover
