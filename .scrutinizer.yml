@@ -10,7 +10,7 @@ build:
     analysis:
       tests:
         override:
-          - command: phpcs-run --config phpcs.xml
+          - phpcs-run
     php72:
       environment:
         php:
