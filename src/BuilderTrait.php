@@ -194,9 +194,9 @@ trait BuilderTrait {
 	/**
 	 * Get affected records.
 	 *
-	 * @return array|\Illuminate\Support\Collection
+	 * @return array
 	 */
-	protected function getAffectedRecords() {
+	protected function getAffectedRecords(): array {
 		// model only
 		if ($this->model->getKey()) {
 			$records = [$this->model];
