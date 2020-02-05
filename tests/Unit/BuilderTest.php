@@ -4,6 +4,7 @@ namespace ProAI\Versioning\Tests\Unit;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use ProAI\Versioning\Exceptions\VersioningException;
 use ProAI\Versioning\Tests\Models\Post;
 use ProAI\Versioning\Tests\Models\User;
 use ProAI\Versioning\Tests\TestCase;
@@ -192,6 +193,21 @@ class BuilderTest extends TestCase {
 
 		// It should still have one join right now
 		$this->assertEquals(1, collect($builder->getQuery()->joins)->where('table', '=', 'users_version')->count());
+	}
+
+	/**
+	 * @test
+	 */
+	public function itWillThrowExceptionWhenKeysAreTooLong(): void {
+		/** @var User $model */
+		$model = factory(User::class)->create([]);
+
+		$this->expectException(VersioningException::class);
+
+		$builder = $model->newQuery();
+		$builder->update([
+			               'a.long.key'  => 'Citadel',
+		               ]);
 	}
 
 	/**
