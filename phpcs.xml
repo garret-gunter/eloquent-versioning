@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<ruleset>
+    <file>./src</file>
+    <file>./tests</file>
+    <exclude-pattern>*/tests/database/migrations/*</exclude-pattern>
+
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg value="sp"/>
+
+    <!--
+       Include all sniffs in the PSR12 standard. Note that the
+       path to the standard does not have to be specified as the
+       PSR12 standard exists inside the PHP_CodeSniffer install
+       directory.
+    -->
+    <rule ref="PSR12">
+        <exclude name="Generic.WhiteSpace.DisallowTabIndent"/>
+        <!-- bracers -->
+        <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
+        <exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine"/>
+    </rule>
+    <rule ref="Generic.WhiteSpace.DisallowSpaceIndent"/>
+
+    <rule ref="Generic.Files.LineEndings">
+        <properties>
+            <property name="eolChar" value="\n"/>
+        </properties>
+    </rule>
+
+    <!-- Indent using tabs. -->
+    <rule ref="Generic.WhiteSpace.ScopeIndent">
+        <properties>
+            <!-- Use tab indents -->
+            <property name="tabIndent" value="true"/>
+            <property name="indent" value="4"/>
+            <!-- Ignore comments and here/nowdocs -->
+            <property name="ignoreIndentationTokens" type="array"
+                      value="T_COMMENT,T_DOC_COMMENT_OPEN_TAG"/>
+        </properties>
+    </rule>
+
+    <!-- bracers -->
+    <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie"/>
+    <rule ref="Generic.Classes.OpeningBraceSameLine"/>
+</ruleset>
