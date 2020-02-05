@@ -19,24 +19,21 @@ build:
           version: 7.2
       tests:
         override:
-          - php-scrutinizer-run
-          - command: vendor/bin/phpunit --prepend .coverage-filter.php
+          - command: phpunit --prepend .coverage-filter.php
     php73:
       environment:
         php:
           version: 7.3
       tests:
         override:
-          - php-scrutinizer-run
-          - command: vendor/bin/phpunit --prepend .coverage-filter.php
+          - command: phpunit --prepend .coverage-filter.php
     php74:
       environment:
         php:
           version: 7.4
       tests:
         override:
-          - php-scrutinizer-run
-          - command: ./vendor/bin/phpunit --coverage-clover=my-coverage-file --prepend .coverage-filter.php
+          - command: phpunit --coverage-clover=my-coverage-file --prepend .coverage-filter.php
             coverage:
               file: my-coverage-file
               format: php-clover
