@@ -3,6 +3,7 @@
 namespace ProAI\Versioning\Tests\Unit;
 
 use Carbon\Carbon;
+use ProAI\Versioning\Tests\Models\Comment;
 use ProAI\Versioning\Tests\Models\User;
 use ProAI\Versioning\Tests\TestCase;
 
@@ -159,30 +160,48 @@ class VersionableTest extends TestCase {
 	 * @test
 	 */
 	public function itWillOnlyVersionVersionedAttributes(): void {
-		/** @var User $model */
-		$model = factory(User::class)->create([]);
-		$email = $model->email;
+		/** @var Comment $model */
+		$model = factory(Comment::class)->create(
+			[
+				'title' => 'Some kind of lorem impsum should go here',
+			]
+		);
+		$originalContent = $model->content;
 
-		$model->email = 'rick@wubba-lubba-dub.dub';
-		$model->username = 'RickSanchez';
+		$newContent = 'I approve of this comment.';
+		$model->content = $newContent;
+		$model->save();
+
+		$newTitle = 'Not lorem ipsum';
+		$model->title = $newTitle;
 		$model->save();
 
 		$this->assertDatabaseHas($model->getTable(), [
-			'username'  => 'RickSanchez',
+			'title'  => $newTitle,
 		]);
 
 		$this->assertDatabaseHas($model->getVersionTable(), [
 			'ref_id'    => $model->id,
 			'version'   => 1,
-			'email'     => $email,
-			'city'      => $model->city
+			'content'     => $originalContent,
 		]);
 
 		$this->assertDatabaseHas($model->getVersionTable(), [
 			'ref_id'    => $model->id,
 			'version'   => 2,
-			'email'     => $model->email,
-			'city'      => $model->city
+			'content'   => $newContent,
+		]);
+
+		// Latest version should be 2.
+		$this->assertDatabaseHas($model->getTable(), [
+			'title' => $newTitle,
+			'latest_version' => 2,
+		]);
+
+		// A 3rd version should not exist.
+		$this->assertDatabaseMissing($model->getVersionTable(), [
+			['ref_id', $model->id,],
+			['version', '>=', 3,],
 		]);
 	}
 }
