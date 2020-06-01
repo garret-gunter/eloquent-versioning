@@ -206,8 +206,8 @@ class BuilderTest extends TestCase {
 
 		$builder = $model->newQuery();
 		$builder->update([
-			               'a.long.key'  => 'Citadel',
-		               ]);
+						   'a.long.key'  => 'Citadel',
+					   ]);
 	}
 
 	/**

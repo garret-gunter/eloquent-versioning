@@ -119,6 +119,11 @@ trait BuilderTrait {
 		// get records
 		$affectedRecords = $this->getAffectedRecords();
 
+		// only update main table if not updating versioned fields.
+		if (empty($versionValues)) {
+			return $this->toBase()->update($values);
+		}
+
 		// update main table records
 		if (! $this->query->increment($this->model->getLatestVersionColumn(), 1, $values)) {
 			return false;
