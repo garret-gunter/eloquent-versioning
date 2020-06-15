@@ -26,11 +26,11 @@ class BuilderTest extends TestCase {
 			'username'          => $model->username,
 			'email'             => $model->email,
 			'city'              => $model->city,
-			'latest_version'    => $model->latest_version,
-			'updated_at'        => $model->updated_at,
-			'created_at'        => $model->created_at,
+			'latest_version'    => (string) $model->latest_version,
+			'updated_at'        => $model->updated_at->toJson(),
+			'created_at'        => $model->created_at->toJson(),
 			'id'                => $model->id,
-			'version'           => 1,
+			'version'           => '1',
 			'deleted_at'        => null,
 		], User::first()->toArray());
 	}
