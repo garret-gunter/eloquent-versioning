@@ -2,6 +2,7 @@
 
 namespace ProAI\Versioning\Tests\Models;
 
+use DateTimeInterface;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use ProAI\Versioning\Versionable;
 use ProAI\Versioning\SoftDeletes;
@@ -49,4 +50,15 @@ class User extends Authenticatable {
 	public $timestamps = true;
 
 	public $versioned = ['email', 'city', 'updated_at', 'deleted_at'];
+
+	/**
+	 * Prepare a date for array / JSON serialization.
+	 *
+	 * @param  \DateTimeInterface  $date
+	 * @return string
+	 */
+	protected function serializeDate(DateTimeInterface $date)
+	{
+	    return $date->toJson();
+	}
 }
