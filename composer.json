@@ -1,5 +1,5 @@
 {
-    "name": "garret-gunter/eloquent-versioning",
+    "name": "binary-cocoa/eloquent-versioning",
     "description": "An extension for the Eloquent ORM to support versioning.",
     "keywords": [
         "laravel",
@@ -12,7 +12,7 @@
         "audit",
         "audits"
     ],
-    "homepage": "http://github.com/garret-gunter/eloquent-versioning",
+    "homepage": "https://github.com/BinaryCocoa/eloquent-versioning",
     "license": "MIT",
     "authors": [
         {
