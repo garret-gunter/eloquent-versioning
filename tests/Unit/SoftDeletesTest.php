@@ -1,15 +1,15 @@
 <?php
 
-namespace ProAI\Versioning\Tests\Unit;
+namespace BinaryCocoa\Versioning\Tests\Unit;
 
-use ProAI\Versioning\Tests\Models\Post;
-use ProAI\Versioning\Tests\Models\User;
-use ProAI\Versioning\Tests\TestCase;
+use BinaryCocoa\Versioning\Tests\Models\Post;
+use BinaryCocoa\Versioning\Tests\Models\User;
+use BinaryCocoa\Versioning\Tests\TestCase;
 
 /**
  * Class SoftDeletesTest
  *
- * @package ProAI\Versioning\Tests
+ * @package BinaryCocoa\Versioning\Tests
  */
 class SoftDeletesTest extends TestCase {
 

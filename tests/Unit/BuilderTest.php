@@ -1,17 +1,17 @@
 <?php
 
-namespace ProAI\Versioning\Tests\Unit;
+namespace BinaryCocoa\Versioning\Tests\Unit;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use ProAI\Versioning\Exceptions\VersioningException;
-use ProAI\Versioning\Tests\Models\Post;
-use ProAI\Versioning\Tests\Models\User;
-use ProAI\Versioning\Tests\TestCase;
+use BinaryCocoa\Versioning\Exceptions\VersioningException;
+use BinaryCocoa\Versioning\Tests\Models\Post;
+use BinaryCocoa\Versioning\Tests\Models\User;
+use BinaryCocoa\Versioning\Tests\TestCase;
 
 /**
  * Class BuilderTest
- * @package ProAI\Versioning\Tests
+ * @package BinaryCocoa\Versioning\Tests
  */
 class BuilderTest extends TestCase {
 

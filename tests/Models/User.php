@@ -1,16 +1,16 @@
 <?php
 
-namespace ProAI\Versioning\Tests\Models;
+namespace BinaryCocoa\Versioning\Tests\Models;
 
 use DateTimeInterface;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use ProAI\Versioning\Versionable;
-use ProAI\Versioning\SoftDeletes;
+use BinaryCocoa\Versioning\Versionable;
+use BinaryCocoa\Versioning\SoftDeletes;
 
 /**
  * Class User
  *
- * @package ProAI\Versioning\Tests\Models
+ * @package BinaryCocoa\Versioning\Tests\Models
  *
  * @property int $id
  * @property string $city

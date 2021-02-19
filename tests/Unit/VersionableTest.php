@@ -1,16 +1,16 @@
 <?php
 
-namespace ProAI\Versioning\Tests\Unit;
+namespace BinaryCocoa\Versioning\Tests\Unit;
 
 use Carbon\Carbon;
-use ProAI\Versioning\Tests\Models\Comment;
-use ProAI\Versioning\Tests\Models\User;
-use ProAI\Versioning\Tests\TestCase;
+use BinaryCocoa\Versioning\Tests\Models\Comment;
+use BinaryCocoa\Versioning\Tests\Models\User;
+use BinaryCocoa\Versioning\Tests\TestCase;
 
 /**
  * Class VersionableTest
  *
- * @package ProAI\Versioning\Tests\Unit
+ * @package BinaryCocoa\Versioning\Tests\Unit
  */
 class VersionableTest extends TestCase {
 

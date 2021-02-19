@@ -1,6 +1,6 @@
 <?php
 
-namespace ProAI\Versioning\Tests;
+namespace BinaryCocoa\Versioning\Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
 

@@ -1,7 +1,7 @@
 <?php
 
 use Faker\Generator as Faker;
-use ProAI\Versioning\Tests\Models\Comment;
+use BinaryCocoa\Versioning\Tests\Models\Comment;
 
 /*
 |--------------------------------------------------------------------------
