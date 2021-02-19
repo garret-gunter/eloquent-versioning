@@ -19,7 +19,7 @@ class VersionableTest extends TestCase {
 	*/
 	public function itWillVersionModelsWhenCreating(): void {
 		/** @var User $model */
-		$model = factory(User::class)->create([]);
+		$model = User::factory()->create([]);
 
 		$this->assertDatabaseHas($model->getTable(), [
 			'id'        => $model->id,
@@ -39,7 +39,7 @@ class VersionableTest extends TestCase {
 	*/
 	public function itWillVersionModelsWhenUpdating(): void {
 		/** @var User $model */
-		$model = factory(User::class)->create([]);
+		$model = User::factory()->create([]);
 		$email = $model->email;
 
 		$model->update([
@@ -70,7 +70,7 @@ class VersionableTest extends TestCase {
 	 */
 	public function itWillVersionModelsWhenSaving(): void {
 		/** @var User $model */
-		$model = factory(User::class)->create([]);
+		$model = User::factory()->create([]);
 		$email = $model->email;
 
 		$model->email = 'rick@wubba-lubba-dub.dub';
@@ -100,7 +100,7 @@ class VersionableTest extends TestCase {
 	 */
 	public function itWillVersionModelsWhenInserting(): void {
 		/** @var User $model */
-		$model = factory(User::class)->make([]);
+		$model = User::factory()->make([]);
 		$model->created_at = Carbon::now();
 		$model->updated_at = Carbon::now();
 
@@ -124,7 +124,7 @@ class VersionableTest extends TestCase {
 	 */
 	public function itWillUpdateTheLatestVersionWhenCreating(): void {
 		/** @var User $model */
-		$model = factory(User::class)->create([]);
+		$model = User::factory()->create([]);
 
 		$this->assertEquals(1, $model->latest_version);
 	}
@@ -134,7 +134,7 @@ class VersionableTest extends TestCase {
 	 */
 	public function itWillUpdateTheLatestVersionWhenUpdating(): void {
 		/** @var User $model */
-		$model = factory(User::class)->create([]);
+		$model = User::factory()->create([]);
 
 		$model->update([
 			'email'     => 'rick@wubba-lubba-dub.dub'
@@ -148,7 +148,7 @@ class VersionableTest extends TestCase {
 	 */
 	public function itWillUpdateTheLatestVersionWhenSaving(): void {
 		/** @var User $model */
-		$model = factory(User::class)->create([]);
+		$model = User::factory()->create([]);
 
 		$model->email = 'rick@wubba-lubba-dub.dub';
 		$model->save();
@@ -161,7 +161,7 @@ class VersionableTest extends TestCase {
 	 */
 	public function itWillOnlyVersionVersionedAttributes(): void {
 		/** @var Comment $model */
-		$model = factory(Comment::class)->create(
+		$model = Comment::factory()->create(
 			[
 				'title' => 'Some kind of lorem impsum should go here',
 			]

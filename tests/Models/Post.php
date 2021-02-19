@@ -2,6 +2,8 @@
 
 namespace BinaryCocoa\Versioning\Tests\Models;
 
+use BinaryCocoa\Versioning\Tests\Database\Factories\PostFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use BinaryCocoa\Versioning\Versionable;
 use BinaryCocoa\Versioning\SoftDeletes;
@@ -22,6 +24,7 @@ use BinaryCocoa\Versioning\SoftDeletes;
 class Post extends Model {
 	use Versionable;
 	use SoftDeletes;
+	use HasFactory;
 
 	/**
 	 * The attributes that are mass assignable.
@@ -35,4 +38,14 @@ class Post extends Model {
 	public $timestamps = true;
 
 	public $versioned = ['content', 'updated_at'];
+
+	/**
+	 * Create a new factory instance for the model.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Factories\Factory
+	 */
+	protected static function newFactory()
+	{
+		return PostFactory::new();
+	}
 }

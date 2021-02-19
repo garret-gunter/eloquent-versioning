@@ -2,6 +2,8 @@
 
 namespace BinaryCocoa\Versioning\Tests\Models;
 
+use BinaryCocoa\Versioning\Tests\Database\Factories\CommentFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use BinaryCocoa\Versioning\Versionable;
 
@@ -23,6 +25,7 @@ use BinaryCocoa\Versioning\Versionable;
  */
 class Comment extends Model {
 	use Versionable;
+	use HasFactory;
 
 	/**
 	 * The attributes that are mass assignable.
@@ -41,4 +44,14 @@ class Comment extends Model {
 	public $timestamps = true;
 
 	public $versioned = ['content'];
+
+	/**
+	 * Create a new factory instance for the model.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Factories\Factory
+	 */
+	protected static function newFactory()
+	{
+		return CommentFactory::new();
+	}
 }
